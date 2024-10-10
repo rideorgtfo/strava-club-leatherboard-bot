@@ -153,16 +153,36 @@ def format_message(top_athletes, metric):
 def athlete_profile_url(athlete_id):
     return f"https://www.strava.com/athletes/{athlete_id}"
 
-# Function to format the combined message for all metrics
+# Function to format the combined message for all metrics for PREVIOUS week
 def format_combined_message():
     try:
-        message = "*Previous Week:*\n\n"
+        message = "*Previous Week Gorgeous Stats:*\n\n"
         club_id = env.str("CLUB_ID")
         metrics = {
             'distance': f'https://www.strava.com/clubs/{club_id}/leaderboard?week_offset=1&per_page=5&sort_by=distance',
             'elev_gain': f'https://www.strava.com/clubs/{club_id}/leaderboard?week_offset=1&per_page=5&sort_by=elev_gain',
             'longest': f'https://www.strava.com/clubs/{club_id}/leaderboard?week_offset=1&per_page=5&sort_by=best_activities_distance',
             'velocity': f'https://www.strava.com/clubs/{club_id}/leaderboard?week_offset=1&per_page=5&sort_by=velocity'
+        }
+        for metric, url in metrics.items():
+            top_athletes = get_top_athletes(url, metric)
+            message += format_message(top_athletes, metric) + "\n"
+        message += f"[Strava Club Link](https://www.strava.com/clubs/{club_id})"
+        return message
+    except Exception as e:
+        print(f"Error in format_combined_message: {e}")
+        raise
+
+# Function to format the combined message for all metrics for THIS week
+def format_combined_message_tweek():
+    try:
+        message = "*This Week Gorgeous Stats:*\n\n"
+        club_id = env.str("CLUB_ID")
+        metrics = {
+            'distance': f'https://www.strava.com/clubs/{club_id}/leaderboard?week_offset=0&per_page=5&sort_by=distance',
+            'elev_gain': f'https://www.strava.com/clubs/{club_id}/leaderboard?week_offset=0&per_page=5&sort_by=elev_gain',
+            'longest': f'https://www.strava.com/clubs/{club_id}/leaderboard?week_offset=0&per_page=5&sort_by=best_activities_distance',
+            'velocity': f'https://www.strava.com/clubs/{club_id}/leaderboard?week_offset=0&per_page=5&sort_by=velocity'
         }
         for metric, url in metrics.items():
             top_athletes = get_top_athletes(url, metric)
@@ -184,7 +204,8 @@ def send_welcome(message):
     try:
         welcome_message = """
 Hello! I am the Strava Club Weekly Top Bot. 🚴‍♂️🏅
-Use /weektop to get the top 5 club members of the week by distance, elevation gain, longest ride, and speed.
+Use /weektop to get the top 5 club members of the previous week by distance, elevation gain, longest ride, and speed.
+Use /tweektop to get the same data for this week.
 You can also use me in inline mode for quick access.
 
 Need help or have questions? Feel free to PM @iceflame.
@@ -203,6 +224,15 @@ def send_week_top(message):
         send_combined_message(message.chat.id)
     except Exception as e:
         print(f"Error in send_week_top: {e}")
+        raise
+
+# Command handler for /tweektop
+@bot.message_handler(commands=['tweektop'])
+def send_tweek_top(message):
+    try:
+        send_combined_message_tweek(message.chat.id)
+    except Exception as e:
+        print(f"Error in send_tweek_top: {e}")
         raise
 
 # Inline query handler
@@ -235,6 +265,19 @@ def send_combined_message(chat_id):
             bot.send_message(chat_id, response_message, parse_mode='Markdown', disable_web_page_preview=True)
     except Exception as e:
         print(f"Error in send_combined_message: {e}")
+        raise
+
+# Function to send the combined message fot THIS week
+def send_combined_message_tweek(chat_id):
+    try:
+        response_message = format_combined_message_tweek()
+        if env.bool("IMAGE"):
+            image_url = env.str("IMAGE_URL")
+            bot.send_photo(chat_id, image_url, caption=response_message, parse_mode='Markdown')
+        else:
+            bot.send_message(chat_id, response_message, parse_mode='Markdown', disable_web_page_preview=True)
+    except Exception as e:
+        print(f"Error in send_combined_message_tweek: {e}")
         raise
 
 # Function to send the weekly message
