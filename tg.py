@@ -115,6 +115,16 @@ def get_top_athletes(url, metric):
         if metric == 'longest':
             for athlete in athletes:
                 athlete['longest'] = athlete.get('best_activities_distance', 0)
+        if metric == 'effort':
+            '''
+            •	Если заезд длинный и сложный (большой D_{\text{eff}}), Effort будет большим.
+            •	Если он был быстрым, Effort тоже будет выше (значит, ехали интенсивно).
+            •	Если заезд был долгим, он тоже получит вес. Время учитывается в формуле, но его посчитали из расстояния и средней скорости
+            '''
+            for athlete in athletes:
+                speed = athlete['velocity'] * 3.6
+                k = 0.02 # коэффициент подъемов
+                athlete['effort'] = (1 + k * int(athlete['elev_gain']) / int(athlete['distance'])) * speed * speed
         return athletes
     except Exception as e:
         print(f"Error in get_top_athletes: {e}")
@@ -128,7 +138,8 @@ def format_message(top_athletes, metric):
             'distance': 'Distance',
             'elev_gain': 'Elevation Gain',
             'longest': 'Longest Ride',
-            'velocity': 'Speed'
+            'velocity': 'Speed',
+            'effort': 'Effort'
         }
         message = f"Top 5 by {full_metric_names[metric]}:\n"
         sorted_athletes = sorted(top_athletes, key=lambda x: x[metric], reverse=True)[:5]
@@ -140,6 +151,8 @@ def format_message(top_athletes, metric):
                 value = f"{int(athlete[metric])} m"
             elif metric == 'velocity':
                 value = f"{athlete[metric] * 3.6:.2f} km/h"  # Convert speed to km/h
+            elif metric == 'effort':
+                value = f"{athlete[metric]:.2f} points"
             else:
                 value = athlete[metric]
             rank_emoji = emoji[index - 1] if index <= 5 else str(index)
@@ -161,6 +174,7 @@ def format_combined_message():
         donation_link = env.str("DONATION_LINK")
         metrics = {
             'distance': f'https://www.strava.com/clubs/{club_id}/leaderboard?week_offset=1&per_page=5&sort_by=distance',
+            'effort': f'https://www.strava.com/clubs/{club_id}/leaderboard?week_offset=1&per_page=5&sort_by=distance',
             'elev_gain': f'https://www.strava.com/clubs/{club_id}/leaderboard?week_offset=1&per_page=5&sort_by=elev_gain',
             'longest': f'https://www.strava.com/clubs/{club_id}/leaderboard?week_offset=1&per_page=5&sort_by=best_activities_distance',
             'velocity': f'https://www.strava.com/clubs/{club_id}/leaderboard?week_offset=1&per_page=5&sort_by=velocity'
