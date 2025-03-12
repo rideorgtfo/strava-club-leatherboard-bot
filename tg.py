@@ -122,9 +122,12 @@ def get_top_athletes(url, metric):
             •	Если заезд был долгим, он тоже получит вес. Время учитывается в формуле, но его посчитали из расстояния и средней скорости
             '''
             for athlete in athletes:
-                speed = athlete['velocity'] * 3.6
                 k = 0.02 # коэффициент подъемов
-                athlete['effort'] = (1 + k * int(athlete['elev_gain']) / int(athlete['distance'])) * speed * speed
+                D = int(athlete['distance'])
+                H = int(athlete['elev_gain'])
+                V = athlete['velocity'] * 3.6
+
+                athlete['effort'] = (D + k * H) * V
             athletes = sorted(athletes, 'effort', reverse=True)
         return athletes
     except Exception as e:
