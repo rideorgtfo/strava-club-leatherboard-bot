@@ -123,12 +123,20 @@ def get_top_athletes(url, metric):
             '''
             for athlete in athletes:
                 k = 0.02 # коэффициент подъемов
-                D = int(athlete['distance'])
-                H = int(athlete['elev_gain'])
-                V = athlete['velocity'] * 3.6
+                distance = int(athlete['distance'])
+                elevation = int(athlete['elev_gain'])
+                speed = athlete['velocity'] * 3.6
 
-                athlete['effort'] = (D + k * H) * V
+                athlete['effort'] = (distance + k * elevation) * speed
             athletes = sorted(athletes, 'effort', reverse=True)
+        if metric == 'total_time':
+            for athlete in athletes:
+                distance = int(athlete['distance'])
+                speed = athlete['velocity'] * 3.6
+                hours_float = distance / speed
+
+                athlete['hours'] = hours_float
+            athletes = sorted(athletes, 'hours', reverse=True)
         return athletes
     except Exception as e:
         print(f"Error in get_top_athletes: {e}")
@@ -157,6 +165,11 @@ def format_message(top_athletes, metric):
                 value = f"{athlete[metric] * 3.6:.2f} km/h"  # Convert speed to km/h
             elif metric == 'effort':
                 value = f"{athlete[metric]:.2f} points"
+            elif metric == 'total_time':
+                hours_float = athlete['hours']
+                hours = int(hours_float)
+                minutes = int((hours_float - hours) * 60)
+                value = f"{hours:02d}:{minutes:02d}"
             else:
                 value = athlete[metric]
             rank_emoji = emoji[index - 1] if index <= 5 else str(index)
