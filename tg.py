@@ -125,6 +125,7 @@ def get_top_athletes(url, metric):
                 speed = athlete['velocity'] * 3.6
                 k = 0.02 # коэффициент подъемов
                 athlete['effort'] = (1 + k * int(athlete['elev_gain']) / int(athlete['distance'])) * speed * speed
+            athletes = sorted(athletes, 'effort', reverse=True)
         return athletes
     except Exception as e:
         print(f"Error in get_top_athletes: {e}")
