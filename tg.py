@@ -38,32 +38,40 @@ def selenium_webdriver():
 def strava_authentication(strava_login, strava_password):
     driver = selenium_webdriver()
     driver.get('https://www.strava.com/login')
+    print("[INFO] Opening Strava login page")
 
     try:
         # Entering email and clicking the continue button
+        print("[INFO] Waiting for email input field")
         WebDriverWait(driver, 60).until(
             EC.presence_of_element_located((By.ID, 'desktop-email'))
         ).send_keys(strava_login)
 
+        print("[INFO] Clicking continue button")
         driver.find_element(By.ID, 'desktop-login-button').click()
 
         # Waiting for and clicking the "Use password instead" button
+        print("[INFO] Waiting for 'Use password instead' button")
         WebDriverWait(driver, 60).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Use password instead')]"))
         ).click()
 
         # Entering the password
+        print("[INFO] Waiting for password input field")
         WebDriverWait(driver, 60).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, 'input[data-cy="password"]'))
         ).send_keys(strava_password)
 
         # Clicking the "Log in" button
+        print("[INFO] Clicking 'Log in' button")
         driver.find_element(By.XPATH, "//button[contains(text(),'Log in')]").click()
 
         # Waiting until login is successful
+        print("[INFO] Waiting for successful login")
         WebDriverWait(driver, 60).until(
             lambda d: d.current_url != 'https://www.strava.com/login'
         )
+        print("[SUCCESS] Login successful!")
 
         all_cookies = driver.get_cookies()
         print("Strava Cookies:")
