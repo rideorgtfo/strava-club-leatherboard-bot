@@ -238,7 +238,7 @@ def send_welcome(message):
     try:
         welcome_message = """
 Hello! I am the Strava Club Weekly Top Bot. 🚴‍♂️🏅
-Use /weektop to get the top 5 club members of the week by distance, elevation gain, longest ride, and speed.
+Use /weektop to get the top 5 club members of the previous week by distance, elevation gain, longest ride, and speed.
 Use /tweektop to get the same data for this week.
 You can also use me in inline mode for quick access.
 
