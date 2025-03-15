@@ -40,30 +40,27 @@ def strava_authentication(strava_login, strava_password):
     driver.get('https://www.strava.com/login')
 
     try:
-
+        # Entering email and clicking the continue button
         WebDriverWait(driver, 60).until(
             EC.presence_of_element_located((By.ID, 'desktop-email'))
-        )
+        ).send_keys(strava_login)
+
+        driver.find_element(By.ID, 'desktop-login-button').click()
+
+        # Waiting for and clicking the "Use password instead" button
         WebDriverWait(driver, 60).until(
-            EC.presence_of_element_located((By.ID, 'desktop-current-password'))
-        )
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Use password instead')]"))
+        ).click()
 
+        # Entering the password
+        WebDriverWait(driver, 60).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 'input[data-cy="password"]'))
+        ).send_keys(strava_password)
 
-        driver.find_element(By.ID, 'desktop-email').send_keys(strava_login)
-        driver.find_element(By.ID, 'desktop-current-password').send_keys(strava_password)
+        # Clicking the "Log in" button
+        driver.find_element(By.XPATH, "//button[contains(text(),'Log in')]").click()
 
-
-        # try:
-        #     WebDriverWait(driver, 10).until(
-        #         EC.element_to_be_clickable((By.CSS_SELECTOR, '.btn-deny-cookie-banner'))
-        #     ).click()
-        # except TimeoutException:
-        #     pass  
-
-
-        driver.find_element(By.ID, 'desktop-login-button').click()  
-
-
+        # Waiting until login is successful
         WebDriverWait(driver, 60).until(
             lambda d: d.current_url != 'https://www.strava.com/login'
         )
