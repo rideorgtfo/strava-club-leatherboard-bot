@@ -31,6 +31,6 @@ jobs:
           uses: docker/build-push-action@v4
           with:
             context: .
-            file: ./Dockerfile.base
+            file: ./Dockerfile
             push: true
             tags: cr.yandex/crpdt2ulmb7b1hrg6jcd:${{ steps.timestamp.outputs.timestamp }}
