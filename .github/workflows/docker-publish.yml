@@ -16,9 +16,9 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v4
 
-        - name: Set timestamp env variable
+        - name: Get Unix timestamp
           id: timestamp
-          run: echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+          run: echo "TIMESTAMP=$(date +%s)" >> $GITHUB_OUTPUT
 
         - name: Login to ECR
           uses: docker/login-action@v3
