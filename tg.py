@@ -52,19 +52,27 @@ def strava_authentication(strava_login, strava_password):
 
         # Waiting for and clicking the "Use password instead" button
         print("[INFO] Waiting for 'Use password instead' button")
-        WebDriverWait(driver, 60).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Use password instead')]"))
+        WebDriverWait(driver, 6000).until(
+            EC.element_to_be_clickable((By.XPATH, "(//button[contains(text(),'Use password instead')])[2]"))
         ).click()
 
         # Entering the password
         print("[INFO] Waiting for password input field")
-        WebDriverWait(driver, 60).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, 'input[data-cy="password"]'))
+        password_fields = WebDriverWait(driver, 6000).until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'input[data-cy="password"]'))
+        )
+        
+        second_password_field = password_fields[1]
+        
+        WebDriverWait(driver, 6000).until(
+            EC.element_to_be_clickable(second_password_field)
         ).send_keys(strava_password)
 
         # Clicking the "Log in" button
         print("[INFO] Clicking 'Log in' button")
-        driver.find_element(By.XPATH, "//button[contains(text(),'Log in')]").click()
+        WebDriverWait(driver, 6000).until(
+            EC.element_to_be_clickable((By.XPATH, "(//button[contains(text(),'Log in')])[2]"))
+        ).click()
 
         # Waiting until login is successful
         print("[INFO] Waiting for successful login")
