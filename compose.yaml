@@ -1,7 +1,14 @@
+x-common-settings: &common-settings
+  build: .
+  restart: always
+  volumes:
+    - .:/app
+
 services:
-  strava_tg_bot:
-    image: dteplov/strava-club-leatherboard-bot:latest
-    container_name: strava_tg_bot
-    restart: always
+  morda_bot:
+    <<: *common-settings
+    container_name: morda_bot
+    env_file:
+      - ./envs/morda.env
     ports:
       - "5900:5900" 
